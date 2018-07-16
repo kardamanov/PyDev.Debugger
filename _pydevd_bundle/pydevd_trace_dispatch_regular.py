@@ -19,6 +19,11 @@ from os.path import basename, splitext
 
 threadingCurrentThread = threading.currentThread
 get_file_type = DONT_TRACE.get
+import sys
+def my_trace(frame, event, arg):
+    sys.stdout.write('Tracing at: %s, %s, %s, %s %s\n' % (frame.f_code.co_filename, frame.f_lineno, event, frame.f_code.co_name, arg))
+    return my_trace
+
 
 # IFDEF CYTHON -- DONT EDIT THIS FILE (it is automatically generated)
 # cdef dict global_cache_skips
@@ -270,9 +275,14 @@ class ThreadTracer:
             except:
                 abs_path_real_path_and_base = get_abs_path_real_path_and_base_from_frame(frame)
             if not isinstance(abs_path_real_path_and_base[1], str):
-                msg = 'Expected to be str. Found: %s\n' % (type(abs_path_real_path_and_base[1]))
+                msg = 'Expected to find str. Found: %s\n' % (type(abs_path_real_path_and_base[1]))
                 msg += 'Initial: %s (%s)\n' % (frame.f_code.co_filename, type(frame.f_code.co_filename))
                 msg += '__file__: %s (%s)\n' % (frame.f_globals.get('__file__'), type(frame.f_globals.get('__file__')))
+                abs_path_real_path_and_base = NORM_PATHS_AND_BASE_CONTAINER.pop(frame.f_code.co_filename)
+                SetTrace(my_trace)
+                frame.f_trace = my_trace
+                abs_path_real_path_and_base = get_abs_path_real_path_and_base_from_frame(frame)
+                SetTrace(None)
                 raise AssertionError(msg)
                 
             filename = abs_path_real_path_and_base[1]
