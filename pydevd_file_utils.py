@@ -197,12 +197,18 @@ def _AbsFile(filename):
 
 
 # Returns tuple of absolute path and real path for given filename
-def _NormPaths(filename):
+def _NormPaths(filename, debug=False):
     try:
+        if debug:
+            raise KeyError('anything')
         return NORM_PATHS_CONTAINER[filename]
     except KeyError:
         abs_path = _NormPath(filename, os.path.abspath)
         real_path = _NormPath(filename, rPath)
+        if debug or not isinstance(abs_path, str):
+            print('in _NormPaths entry: %s (%s)' % (filename, type(filename)))
+            print('in _NormPaths abs_path: %s (%s)' % (abs_path, type(abs_path)))
+            print('in _NormPaths real_path: %s (%s)' % (real_path, type(real_path)))
 
         # cache it for fast access later
         NORM_PATHS_CONTAINER[filename] = abs_path, real_path
@@ -365,6 +371,7 @@ def setup_client_server_paths(paths):
     # Apply normcase to the existing paths to follow the os preferences.
 
     for i, path in enumerate(paths_from_eclipse_to_python[:]):
+        print('type paths_from_eclipse_to_python %s (%s), %s (%s)' %  (path[0], type(path[0]), path[1], type(path[1])))
         paths_from_eclipse_to_python[i] = (normcase(path[0]), normcase(path[1]))
 
     if not paths_from_eclipse_to_python:
@@ -463,19 +470,26 @@ setup_client_server_paths(PATHS_FROM_ECLIPSE_TO_PYTHON)
 
 
 # For given file f returns tuple of its absolute path, real path and base name
-def get_abs_path_real_path_and_base_from_file(f):
+def get_abs_path_real_path_and_base_from_file(f, debug=False):
     try:
+        if debug:
+            raise ValueError('anything')
         return NORM_PATHS_AND_BASE_CONTAINER[f]
     except:
-        abs_path, real_path = _NormPaths(f)
+        abs_path, real_path = _NormPaths(f, debug=debug)
+        if debug:
+            print('found (abs_path after _NormPaths): %s (%s)' % (abs_path, type(abs_path)))
+            print('found (real_path after _NormPaths): %s (%s)' % (real_path, type(real_path)))
         base = basename(real_path)
         ret = abs_path, real_path, base
         NORM_PATHS_AND_BASE_CONTAINER[f] = ret
         return ret
 
 
-def get_abs_path_real_path_and_base_from_frame(frame):
+def get_abs_path_real_path_and_base_from_frame(frame, debug=False):
     try:
+        if debug:
+            raise ValueError('anything')
         return NORM_PATHS_AND_BASE_CONTAINER[frame.f_code.co_filename]
     except:
         # This one is just internal (so, does not need any kind of client-server translation)
@@ -489,7 +503,9 @@ def get_abs_path_real_path_and_base_from_frame(frame):
             elif f.endswith('$py.class'):
                 f = f[:-len('$py.class')] + '.py'
 
-        ret = get_abs_path_real_path_and_base_from_file(f)
+        if debug:
+            print('found (entry): %s (%s)' % (f, type(f)))
+        ret = get_abs_path_real_path_and_base_from_file(f, debug=debug)
         # Also cache based on the frame.f_code.co_filename (if we had it inside build/bdist it can make a difference).
         NORM_PATHS_AND_BASE_CONTAINER[frame.f_code.co_filename] = ret
         return ret
