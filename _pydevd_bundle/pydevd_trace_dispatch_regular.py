@@ -269,6 +269,11 @@ class ThreadTracer:
                 abs_path_real_path_and_base = NORM_PATHS_AND_BASE_CONTAINER[frame.f_code.co_filename]
             except:
                 abs_path_real_path_and_base = get_abs_path_real_path_and_base_from_frame(frame)
+            if not isinstance(abs_path_real_path_and_base[1], str):
+                msg = 'Expected to be str. Found: %s\n' % (type(abs_path_real_path_and_base[1]))
+                msg += 'Initial: %s (%s)\n' % (frame.f_code.co_filename, type(frame.f_code.co_filename))
+                msg += '__file__: %s (%s)\n' % (frame.f_globals.get('__file__'), type(frame.f_globals.get('__file__')))
+                raise AssertionError(msg)
                 
             filename = abs_path_real_path_and_base[1]
             file_type = get_file_type(abs_path_real_path_and_base[-1]) #we don't want to debug threading or anything related to pydevd
