@@ -1216,11 +1216,10 @@ cdef class ThreadTracer:
                 msg = 'Expected to find str. Found: %s\n' % (type(abs_path_real_path_and_base[1]))
                 msg += 'Initial: %s (%s)\n' % (frame.f_code.co_filename, type(frame.f_code.co_filename))
                 msg += '__file__: %s (%s)\n' % (frame.f_globals.get('__file__'), type(frame.f_globals.get('__file__')))
-                abs_path_real_path_and_base = NORM_PATHS_AND_BASE_CONTAINER.pop(frame.f_code.co_filename)
-                SetTrace(my_trace)
-                frame.f_trace = my_trace
-                abs_path_real_path_and_base = get_abs_path_real_path_and_base_from_frame(frame)
-                SetTrace(None)
+                abs_path_real_path_and_base = get_abs_path_real_path_and_base_from_frame(frame, debug=True)
+                NORM_PATHS_AND_BASE_CONTAINER.pop(frame.f_code.co_filename, None)
+                msg += 'new translation output: %s (%s)\n' % (abs_path_real_path_and_base[1], type(abs_path_real_path_and_base[1]))
+                print(msg)
                 raise AssertionError(msg)
                 
             filename = abs_path_real_path_and_base[1]
