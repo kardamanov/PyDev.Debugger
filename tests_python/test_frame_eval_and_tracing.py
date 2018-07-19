@@ -196,10 +196,11 @@ class WriterThreadAddTerminationExceptionBreak(debugger_unittest.AbstractWriterT
         self.finished_ok = True
 
 
-@pytest.mark.skip(reason=
-                  'Frame eval is not currently meant to be used in the debugger and tests are flaky.\n'
-                  'Feature must be reviewed to be included again.\n'
-                  )
+@pytest.mark.skipif(
+    True, 
+    reason='Frame eval is not currently meant to be used in the debugger and tests are flaky.\n'
+           'Feature must be reviewed to be included again.\n'
+)
 class TestFrameEval(unittest.TestCase, debugger_unittest.DebuggerRunner):
     
     def get_command_line(self):

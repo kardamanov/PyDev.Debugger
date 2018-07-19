@@ -231,8 +231,6 @@ def generate_imports_tip_for_module(obj_to_complete, dir_comps=None, getattr=get
 
                             r = []
                             for a in args:
-                                if len(r) > 0:
-                                    r = r + ', '
                                 r.append(str(a))
                                 
                             for a in kwonly_args:
