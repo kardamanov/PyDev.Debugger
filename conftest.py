@@ -11,6 +11,58 @@ def pytest_report_header(config):
     import multiprocessing
     print('Number of processors: %s' % (multiprocessing.cpu_count(),))
 
+
+@pytest.fixture(scope="session", autouse=True)
+def check_no_threads():
+    yield
+    # After the session finishes, wait 20 seconds to see if everything finished properly
+    # and if it doesn't report an error.
+    import threading
+    if hasattr(sys, '_current_frames') and hasattr(threading, 'enumerate'):
+        import time
+        import traceback
+
+        class DumpThreads(threading.Thread):
+            def run(self):
+                time.sleep(20)
+
+                thread_id_to_name = {}
+                try:
+                    for t in threading.enumerate():
+                        thread_id_to_name[t.ident] = '%s  (daemon: %s)' % (t.name, t.daemon)
+                except:
+                    pass
+
+                stack_trace = [
+                    '===============================================================================',
+                    'pydev pyunit runner: Threads still found running after tests finished',
+                    '================================= Thread Dump =================================']
+
+                for thread_id, stack in sys._current_frames().items():
+                    stack_trace.append('\n-------------------------------------------------------------------------------')
+                    stack_trace.append(" Thread %s" % thread_id_to_name.get(thread_id, thread_id))
+                    stack_trace.append('')
+
+                    if 'self' in stack.f_locals:
+                        sys.stderr.write(str(stack.f_locals['self']) + '\n')
+
+                    for filename, lineno, name, line in traceback.extract_stack(stack):
+                        stack_trace.append(' File "%s", line %d, in %s' % (filename, lineno, name))
+                        if line:
+                            stack_trace.append("   %s" % (line.strip()))
+                stack_trace.append('\n=============================== END Thread Dump ===============================')
+                sys.stderr.write('\n'.join(stack_trace))
+                
+                # Force thread run to finish
+                import os
+                os._exit(123)
+
+
+        dump_current_frames_thread = DumpThreads()
+        dump_current_frames_thread.setDaemon(True)  # Daemon so that this thread doesn't halt it!
+        dump_current_frames_thread.start()
+
+
 # see: http://goo.gl/kTQMs
 SYMBOLS = {
     'customary'     : ('B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'),

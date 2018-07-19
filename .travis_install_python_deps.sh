@@ -1,6 +1,7 @@
 #!/bin/bash
 set -ev
 
+source activate build_env
 conda install --yes numpy ipython cython pytest psutil
 
 if [ "$PYDEVD_PYTHON_VERSION" = "2.6" ]; then
