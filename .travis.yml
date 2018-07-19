@@ -108,7 +108,7 @@ install:
 # On remove machine with python: c:\bin\python27\python.exe -m pytest
 script:
   # pytest-xdist not available for python == 2.6
-  - if [ "$PYDEVD_TEST_JYTHON" == "NO" && "$PYDEVD_PYTHON_VERSION" == "2.6" ]; then source activate build_env; python -m pytest; fi
-  - if [ "$PYDEVD_TEST_JYTHON" == "NO" && "$PYDEVD_PYTHON_VERSION" != "2.6" ]; then source activate build_env; python -m pytest -n auto; fi
+  - if [[ ("$PYDEVD_TEST_JYTHON" == "NO") && ("$PYDEVD_PYTHON_VERSION" == "2.6") ]]; then source activate build_env; python -m pytest; fi
+  - if [[ ("$PYDEVD_TEST_JYTHON" == "NO") && ("$PYDEVD_PYTHON_VERSION" != "2.6") ]]; then source activate build_env; python -m pytest -n auto; fi
   - if [ "$PYDEVD_TEST_JYTHON" == "YES" ]; then jython -Dpython.path=.:jython_test_deps/ant.jar:jython_test_deps/junit.jar -m pytest; fi
   
