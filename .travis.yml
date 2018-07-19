@@ -16,7 +16,7 @@ matrix:
         - JYTHON_URL=http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7.0/jython-installer-2.7.0.jar
     
     # Python 2.6 (with and without cython)
-    - python: 2.7
+#     - python: 2.7
 #       env:
 #         - PYDEVD_PYTHON_VERSION=2.6
 #         - PYDEVD_USE_CYTHON=NO
@@ -40,7 +40,7 @@ matrix:
         - PYDEVD_TEST_JYTHON=NO
       
     # Python 3.5 (with and without cython)
-    - python: 2.7
+#     - python: 2.7
 #       env:
 #         - PYDEVD_PYTHON_VERSION=3.5
 #         - PYDEVD_USE_CYTHON=NO
