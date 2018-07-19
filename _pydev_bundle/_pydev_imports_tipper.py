@@ -6,13 +6,16 @@ from _pydev_bundle._pydev_tipper_common import do_find
 from _pydevd_bundle.pydevd_constants import IS_PY2
 
 if IS_PY2:
-    from inspect import getargspec
+    from inspect import getargspec as _originalgetargspec
+    def getargspec(*args, **kwargs):
+        return _originalgetargspec(*args, **kwargs), [], {}
+        
 else:
     from inspect import getfullargspec
 
     def getargspec(*args, **kwargs):
         arg_spec = getfullargspec(*args, **kwargs)
-        return arg_spec.args, arg_spec.varargs, arg_spec.varkw, arg_spec.defaults
+        return arg_spec.args, arg_spec.varargs, arg_spec.varkw, arg_spec.defaults, arg_spec.kwonlyargs or [], arg_spec.kwonlydefaults or {}
 
 try:
     xrange
@@ -150,6 +153,8 @@ def check_char(c):
         return '_'
     return c
 
+_SENTINEL = object()
+
 def generate_imports_tip_for_module(obj_to_complete, dir_comps=None, getattr=getattr, filter=lambda name:True):
     '''
         @param obj_to_complete: the object from where we should get the completions
@@ -222,14 +227,22 @@ def generate_imports_tip_for_module(obj_to_complete, dir_comps=None, getattr=get
 
                     if inspect.ismethod(obj) or inspect.isbuiltin(obj) or inspect.isfunction(obj) or inspect.isroutine(obj):
                         try:
-                            args, vargs, kwargs, defaults = getargspec(obj)
+                            args, vargs, kwargs, defaults, kwonly_args, kwonly_defaults = getargspec(obj)
 
-                            r = ''
-                            for a in (args):
+                            r = []
+                            for a in args:
                                 if len(r) > 0:
                                     r = r + ', '
-                                r = r + str(a)
-                            args = '(%s)' % (r)
+                                r.append(str(a))
+                                
+                            for a in kwonly_args:
+                                default = kwonly_defaults.get(a, _SENTINEL)
+                                if default is not _SENTINEL:
+                                    r.append('%s=%s' % (a, default))
+                                else:
+                                    r.append(str(a))
+                            
+                            args = '(%s)' % (', '.join(r))
                         except TypeError:
                             #ok, let's see if we can get the arguments from the doc
                             args, doc = signature_from_docstring(doc, getattr(obj, '__name__', None))

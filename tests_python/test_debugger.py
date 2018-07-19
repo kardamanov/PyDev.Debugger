@@ -873,7 +873,8 @@ class WriterThreadCase4(debugger_unittest.AbstractWriterThread):
 
         self.write_suspend_thread(thread_id)
 
-        time.sleep(4)  # wait for time enough for the test to finish if it wasn't suspended
+        thread_id2, frame_id, suspend_type = self.wait_for_breakpoint_hit_with_suspend_type(REASON_THREAD_SUSPEND)
+        assert thread_id2 == thread_id
 
         self.write_run_thread(thread_id)
 

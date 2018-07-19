@@ -22,7 +22,7 @@ _started_monitoring_threads = False
 def _start_monitoring_threads():
     # After the session finishes, wait 20 seconds to see if everything finished properly
     # and if it doesn't report an error.
-
+    global _started_monitoring_threads
     if _started_monitoring_threads:
         return
 
