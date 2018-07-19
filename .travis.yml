@@ -2,46 +2,76 @@ language: python
 
 matrix:
   include:
+    # Note: python is always 2.7 because it's the installed version
+    # in the travis system (so, faster to startup).
+    # We'll always use conda later on anyways to get what we want.
+    
     # Python 2.6 (with and without cython)
-    - python: 2.6
-      env: PYDEVD_USE_CYTHON=NO
-      env: PYDEVD_TEST_JYTHON=NO
-    - python: 2.6
-      env: PYDEVD_USE_CYTHON=YES
-      env: PYDEVD_TEST_JYTHON=NO
+    - python: 2.7
+      env:
+        - PYDEVD_USE_CYTHON=NO
+        - PYDEVD_TEST_JYTHON=NO
+        - PYDEVD_PYTHON_VERSION=2.6
+    - python: 2.7
+      env:
+        - PYDEVD_USE_CYTHON=YES
+        - PYDEVD_TEST_JYTHON=NO
+        - PYDEVD_PYTHON_VERSION=2.6
+      
     # Python 2.7 (with and without cython)
     - python: 2.7
-      env: PYDEVD_USE_CYTHON=NO
-      env: PYDEVD_TEST_JYTHON=NO
+      env:
+        - PYDEVD_USE_CYTHON=NO
+        - PYDEVD_TEST_JYTHON=NO
+        - PYDEVD_PYTHON_VERSION=2.7
     - python: 2.7
-      env: PYDEVD_USE_CYTHON=YES
-      env: PYDEVD_TEST_JYTHON=NO
+      env:
+        - PYDEVD_USE_CYTHON=YES
+        - PYDEVD_TEST_JYTHON=NO
+        - PYDEVD_PYTHON_VERSION=2.7
+      
     # Python 3.5 (with and without cython)
-    - python: 3.5
-      env: PYDEVD_USE_CYTHON=NO
-      env: PYDEVD_TEST_JYTHON=NO
-    - python: 3.5
-      env: PYDEVD_USE_CYTHON=YES
-      env: PYDEVD_TEST_JYTHON=NO
-    # Python 3.6 (with and without cython)
-    - python: 3.6
-      env: PYDEVD_USE_CYTHON=NO
-      env: PYDEVD_TEST_JYTHON=NO
-    - python: 3.6
-      env: PYDEVD_USE_CYTHON=YES
-      env: PYDEVD_TEST_JYTHON=NO
+    - python: 2.7
+      env:
+        - PYDEVD_USE_CYTHON=NO
+        - PYDEVD_TEST_JYTHON=NO
+        - PYDEVD_PYTHON_VERSION=3.5
+    - python: 2.7
+      env:
+        - PYDEVD_USE_CYTHON=YES
+        - PYDEVD_TEST_JYTHON=NO
+        - PYDEVD_PYTHON_VERSION=3.5
+      
+    # Python 2.7 (with and without cython)
+    - python: 2.7
+      env:
+        - PYDEVD_USE_CYTHON=NO
+        - PYDEVD_TEST_JYTHON=NO
+        - PYDEVD_PYTHON_VERSION=3.6
+    - python: 2.7
+      env:
+        - PYDEVD_USE_CYTHON=YES
+        - PYDEVD_TEST_JYTHON=NO
+        - PYDEVD_PYTHON_VERSION=3.6
+      
     # Python 3.7 (with and without cython)
-    - python: 3.6
-      env: PYDEVD_USE_CYTHON=NO
-      env: PYDEVD_TEST_JYTHON=NO
-    - python: 3.7
-      env: PYDEVD_USE_CYTHON=YES
-      env: PYDEVD_TEST_JYTHON=NO
+    - python: 2.7
+      env:
+        - PYDEVD_USE_CYTHON=NO
+        - PYDEVD_TEST_JYTHON=NO
+        - PYDEVD_PYTHON_VERSION=3.7
+    - python: 2.7
+      env:
+        - PYDEVD_USE_CYTHON=YES
+        - PYDEVD_TEST_JYTHON=NO
+        - PYDEVD_PYTHON_VERSION=3.7
+      
     # Jython
     - python: 2.7
-      env: PYDEVD_USE_CYTHON=NO
-      env: PYDEVD_TEST_JYTHON=YES
-      env: JYTHON_URL=http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7.0/jython-installer-2.7.0.jar
+      env:
+        - PYDEVD_USE_CYTHON=NO
+        - PYDEVD_TEST_JYTHON=YES
+        - JYTHON_URL=http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7.0/jython-installer-2.7.0.jar
 
 before_install:
   # CPython setup
@@ -64,7 +94,7 @@ install:
   # Both
   - export PYTHONPATH=.
   # Python setup
-  - if [ "$PYDEVD_TEST_JYTHON" == "NO" ]; then conda create --yes -n build_env python=$TRAVIS_PYTHON_VERSION; fi
+  - if [ "$PYDEVD_TEST_JYTHON" == "NO" ]; then conda create --yes -n build_env python=$PYDEVD_PYTHON_VERSION; fi
   - if [ "$PYDEVD_TEST_JYTHON" == "NO" ]; then source activate build_env; fi
   - if [ "$PYDEVD_TEST_JYTHON" == "NO" ]; then chmod +x ./.travis_install_python_deps.sh; fi
   - if [ "$PYDEVD_TEST_JYTHON" == "NO" ]; then ./.travis_install_python_deps.sh; fi
