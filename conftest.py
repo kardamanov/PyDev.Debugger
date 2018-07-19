@@ -8,8 +8,12 @@ from tests_python.debug_constants import TEST_JYTHON
 def pytest_report_header(config):
     print('PYDEVD_USE_CYTHON: %s' % (TEST_CYTHON,))
     print('PYDEVD_TEST_JYTHON: %s' % (TEST_JYTHON,))
-    import multiprocessing
-    print('Number of processors: %s' % (multiprocessing.cpu_count(),))
+    try:
+        import multiprocessing
+    except ImportError:
+        pass
+    else:
+        print('Number of processors: %s' % (multiprocessing.cpu_count(),))
 
 
 @pytest.fixture(scope="session", autouse=True)
