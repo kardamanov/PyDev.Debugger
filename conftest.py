@@ -16,7 +16,7 @@ def pytest_report_header(config):
         print('Number of processors: %s' % (multiprocessing.cpu_count(),))
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.yield_fixture(scope="session", autouse=True)
 def check_no_threads():
     yield
     # After the session finishes, wait 20 seconds to see if everything finished properly
