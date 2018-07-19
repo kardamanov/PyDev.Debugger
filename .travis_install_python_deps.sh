@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ev
 
-conda install --yes numpy ipython cython pytest psutil
+conda install --yes numpy ipython cython pytest pytest-xdist psutil
 
 if [ "$TRAVIS_PYTHON_VERSION" = "2.6" ]; then
     conda install --yes pyqt=4
@@ -18,6 +18,5 @@ if [ "$TRAVIS_PYTHON_VERSION" = "3.5" ]; then
 fi
 
 pip install Pympler
-pip install pytest
 pip install untangle
 pip install scapy==2.4.0
