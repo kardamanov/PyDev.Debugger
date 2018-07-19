@@ -196,8 +196,10 @@ class WriterThreadAddTerminationExceptionBreak(debugger_unittest.AbstractWriterT
         self.finished_ok = True
 
 
-@pytest.mark.skipif(
-    not IS_PY36 or not IS_CPYTHON or not TEST_CYTHON or IS_APPVEYOR, reason='Test requires Python 3.6 / flaky on appveyor')
+@pytest.mark.skip(reason=
+                  'Frame eval is not currently meant to be used in the debugger and tests are flaky.\n'
+                  'Feature must be reviewed to be included again.\n'
+                  )
 class TestFrameEval(unittest.TestCase, debugger_unittest.DebuggerRunner):
     
     def get_command_line(self):

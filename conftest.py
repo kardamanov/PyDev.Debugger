@@ -16,17 +16,24 @@ def pytest_report_header(config):
         print('Number of processors: %s' % (multiprocessing.cpu_count(),))
 
 
-@pytest.yield_fixture(scope="session", autouse=True)
-def check_no_threads():
-    yield
+_started_monitoring_threads = False
+
+
+def _start_monitoring_threads():
     # After the session finishes, wait 20 seconds to see if everything finished properly
     # and if it doesn't report an error.
+
+    if _started_monitoring_threads:
+        return
+
+    _started_monitoring_threads = True
     import threading
     if hasattr(sys, '_current_frames') and hasattr(threading, 'enumerate'):
         import time
         import traceback
 
         class DumpThreads(threading.Thread):
+
             def run(self):
                 time.sleep(20)
 
@@ -56,15 +63,24 @@ def check_no_threads():
                             stack_trace.append("   %s" % (line.strip()))
                 stack_trace.append('\n=============================== END Thread Dump ===============================')
                 sys.stderr.write('\n'.join(stack_trace))
-                
+
                 # Force thread run to finish
                 import os
                 os._exit(123)
 
-
         dump_current_frames_thread = DumpThreads()
         dump_current_frames_thread.setDaemon(True)  # Daemon so that this thread doesn't halt it!
         dump_current_frames_thread.start()
+
+
+def pytest_unconfigure():
+    _start_monitoring_threads()
+
+
+@pytest.yield_fixture(scope="session", autouse=True)
+def check_no_threads():
+    yield
+    _start_monitoring_threads()
 
 
 # see: http://goo.gl/kTQMs
@@ -76,6 +92,7 @@ SYMBOLS = {
     'iec_ext'       : ('byte', 'kibi', 'mebi', 'gibi', 'tebi', 'pebi', 'exbi',
                        'zebi', 'yobi'),
 }
+
 
 def bytes2human(n, format='%(value).1f %(symbol)s', symbols='customary'):
     """
@@ -129,23 +146,27 @@ def bytes2human(n, format='%(value).1f %(symbol)s', symbols='customary'):
     symbols = SYMBOLS[symbols]
     prefix = {}
     for i, s in enumerate(symbols[1:]):
-        prefix[s] = 1 << (i+1)*10
+        prefix[s] = 1 << (i + 1) * 10
     for symbol in reversed(symbols[1:]):
         if n >= prefix[symbol]:
             value = float(n) / prefix[symbol]
             return format % locals()
     return format % dict(symbol=symbols[0], value=n)
 
+
 def format_memory_info(memory_info, curr_proc_memory_info):
     return 'Total: %s, Available: %s, Used: %s %%, Curr process: %s' % (
         bytes2human(memory_info.total), bytes2human(memory_info.available), memory_info.percent, format_process_memory_info(curr_proc_memory_info))
 
+
 def format_process_memory_info(proc_memory_info):
     return bytes2human(proc_memory_info.rss)
+
 
 DEBUG_MEMORY_INFO = False
 
 _global_collect_info = False
+
 
 @pytest.yield_fixture(autouse=True)
 def before_after_each_function(request):
@@ -218,10 +239,12 @@ Memory after: %s
 ''' % (
     request.function,
     format_memory_info(psutil.virtual_memory(), after_curr_proc_memory_info),
-    '' if not processes_info else '\nLeaked processes:\n'+'\n'.join(processes_info)),
+    '' if not processes_info else '\nLeaked processes:\n' + '\n'.join(processes_info)),
     )
 
+
 if IS_JYTHON or IS_IRONPYTHON:
+
     # On Jython and IronPython, it's a no-op.
     def before_after_each_function():
         pass
