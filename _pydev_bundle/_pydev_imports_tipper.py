@@ -8,7 +8,10 @@ from _pydevd_bundle.pydevd_constants import IS_PY2
 if IS_PY2:
     from inspect import getargspec as _originalgetargspec
     def getargspec(*args, **kwargs):
-        return _originalgetargspec(*args, **kwargs), [], {}
+        ret = list(_originalgetargspec(*args, **kwargs))
+        ret.append([])
+        ret.append({})
+        return ret
         
 else:
     from inspect import getfullargspec
