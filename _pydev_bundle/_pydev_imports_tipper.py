@@ -158,10 +158,10 @@ _SENTINEL = object()
 def generate_imports_tip_for_module(obj_to_complete, dir_comps=None, getattr=getattr, filter=lambda name:True):
     '''
         @param obj_to_complete: the object from where we should get the completions
-        @param dir_comps: if passed, we should not 'dir' the object and should just iterate those passed as a parameter
-        @param getattr: the way to get a given object from the obj_to_complete (used for the completer)
-        @param filter: a callable that receives the name and decides if it should be appended or not to the results
-        @return: list of tuples, so that each tuple represents a completion with:
+        @param dir_comps: if passed, we should not 'dir' the object and should just iterate those passed as kwonly_arg parameter
+        @param getattr: the way to get kwonly_arg given object from the obj_to_complete (used for the completer)
+        @param filter: kwonly_arg callable that receives the name and decides if it should be appended or not to the results
+        @return: list of tuples, so that each tuple represents kwonly_arg completion with:
             name, doc, args, type (from the TYPE_* constants)
     '''
     ret = []
@@ -229,18 +229,16 @@ def generate_imports_tip_for_module(obj_to_complete, dir_comps=None, getattr=get
                         try:
                             args, vargs, kwargs, defaults, kwonly_args, kwonly_defaults = getargspec(obj)
 
-                            r = []
-                            for a in args:
-                                r.append(str(a))
+                            args = args[:]
                                 
-                            for a in kwonly_args:
-                                default = kwonly_defaults.get(a, _SENTINEL)
+                            for kwonly_arg in kwonly_args:
+                                default = kwonly_defaults.get(kwonly_arg, _SENTINEL)
                                 if default is not _SENTINEL:
-                                    r.append('%s=%s' % (a, default))
+                                    args.append('%s=%s' % (kwonly_arg, default))
                                 else:
-                                    r.append(str(a))
+                                    args.append(str(kwonly_arg))
                             
-                            args = '(%s)' % (', '.join(r))
+                            args = '(%s)' % (', '.join(args))
                         except TypeError:
                             #ok, let's see if we can get the arguments from the doc
                             args, doc = signature_from_docstring(doc, getattr(obj, '__name__', None))
