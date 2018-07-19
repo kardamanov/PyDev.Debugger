@@ -5,13 +5,22 @@ matrix:
     # Note: python is always 2.7 because it's the installed version
     # in the travis system (so, faster to startup).
     # We'll always use conda later on anyways to get what we want.
+
+    # Note: some envs commented out to have a faster test suite.
+    
+    # Jython
+    - python: 2.7
+      env:
+        - PYDEVD_USE_CYTHON=NO
+        - PYDEVD_TEST_JYTHON=YES
+        - JYTHON_URL=http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7.0/jython-installer-2.7.0.jar
     
     # Python 2.6 (with and without cython)
     - python: 2.7
-      env:
-        - PYDEVD_PYTHON_VERSION=2.6
-        - PYDEVD_USE_CYTHON=NO
-        - PYDEVD_TEST_JYTHON=NO
+#       env:
+#         - PYDEVD_PYTHON_VERSION=2.6
+#         - PYDEVD_USE_CYTHON=NO
+#         - PYDEVD_TEST_JYTHON=NO
     - python: 2.7
       env:
         - PYDEVD_PYTHON_VERSION=2.6
@@ -32,22 +41,22 @@ matrix:
       
     # Python 3.5 (with and without cython)
     - python: 2.7
-      env:
-        - PYDEVD_PYTHON_VERSION=3.5
-        - PYDEVD_USE_CYTHON=NO
-        - PYDEVD_TEST_JYTHON=NO
+#       env:
+#         - PYDEVD_PYTHON_VERSION=3.5
+#         - PYDEVD_USE_CYTHON=NO
+#         - PYDEVD_TEST_JYTHON=NO
     - python: 2.7
       env:
         - PYDEVD_PYTHON_VERSION=3.5
         - PYDEVD_USE_CYTHON=YES
         - PYDEVD_TEST_JYTHON=NO
       
-    # Python 2.7 (with and without cython)
-    - python: 2.7
-      env:
-        - PYDEVD_PYTHON_VERSION=3.6
-        - PYDEVD_USE_CYTHON=NO
-        - PYDEVD_TEST_JYTHON=NO
+    # Python 3.6 (with and without cython)
+#     - python: 2.7
+#       env:
+#         - PYDEVD_PYTHON_VERSION=3.6
+#         - PYDEVD_USE_CYTHON=NO
+#         - PYDEVD_TEST_JYTHON=NO
     - python: 2.7
       env:
         - PYDEVD_PYTHON_VERSION=3.6
@@ -60,18 +69,11 @@ matrix:
         - PYDEVD_PYTHON_VERSION=3.7
         - PYDEVD_USE_CYTHON=NO
         - PYDEVD_TEST_JYTHON=NO
-    - python: 2.7
-      env:
-        - PYDEVD_PYTHON_VERSION=3.7
-        - PYDEVD_USE_CYTHON=YES
-        - PYDEVD_TEST_JYTHON=NO
-      
-    # Jython
-    - python: 2.7
-      env:
-        - PYDEVD_USE_CYTHON=NO
-        - PYDEVD_TEST_JYTHON=YES
-        - JYTHON_URL=http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7.0/jython-installer-2.7.0.jar
+#     - python: 2.7
+#       env:
+#         - PYDEVD_PYTHON_VERSION=3.7
+#         - PYDEVD_USE_CYTHON=YES
+#         - PYDEVD_TEST_JYTHON=NO
 
 before_install:
   # CPython setup
